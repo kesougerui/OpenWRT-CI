@@ -62,3 +62,34 @@ if [[ "${WRT_TARGET^^}" == *"QUALCOMMAX"* ]]; then
 		echo "qualcommax set up nowifi successfully!"
 	fi
 fi
+
+
+#eBPF/dae 内核配置（源码默认关闭，按 dae 官方文档要求开启）
+enable_ebpf_kernel_cfg() {
+	local KEY VAL FILE
+	for FILE in ./target/linux/generic/config-* ./target/linux/${WRT_TARGET:-qualcommax}/config-*; do
+		[ -f "$FILE" ] || continue
+		for KV in \
+			"CONFIG_CGROUPS=y" \
+			"CONFIG_KPROBES=y" \
+			"CONFIG_NET_SCH_INGRESS=m" \
+			"CONFIG_NET_CLS_BPF=m" \
+			"CONFIG_NET_ACT_BPF=m" \
+			"CONFIG_NET_CLS_ACT=y" \
+			"CONFIG_BPF_STREAM_PARSER=y" \
+			"CONFIG_DEBUG_INFO_BTF=y" \
+			"CONFIG_KPROBE_EVENTS=y" \
+			"CONFIG_BPF_EVENTS=y"
+		do
+			KEY="${KV%%=*}"
+			VAL="${KV#*=}"
+			if grep -qE "^(${KEY}=|# ${KEY} is not set)" "$FILE"; then
+				sed -i -e "s|^# ${KEY} is not set|${KEY}=${VAL}|" -e "s|^${KEY}=.*|${KEY}=${VAL}|" "$FILE"
+			else
+				echo "${KV}" >> "$FILE"
+			fi
+		done
+		echo "kernel eBPF config applied: $FILE"
+	done
+}
+enable_ebpf_kernel_cfg
