@@ -10,12 +10,10 @@ on:
   workflow_dispatch:
     inputs:
       CONFIG:
+        description: '编译配置'
         default: 'IPQ60XX-WIFI-YES'
         required: true
-        type: choice
-        options:
-          - IPQ60XX-WIFI-NO
-          - IPQ60XX-WIFI-YES
+        type: string
       SOURCE:
         default: 'VIKINGYFY/immortalwrt'
         required: true
