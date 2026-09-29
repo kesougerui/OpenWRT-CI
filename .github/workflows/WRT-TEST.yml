@@ -11,7 +11,7 @@ on:
     inputs:
       CONFIG:
         description: '编译配置'
-        default: 'IPQ60XX-WIFI-YES'
+        default: 'IPQ60XX-WIFI-NO'
         required: true
         type: string
       SOURCE:
