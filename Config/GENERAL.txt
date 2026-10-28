@@ -57,3 +57,13 @@ CONFIG_PACKAGE_openssh-keygen=y
 CONFIG_PACKAGE_openssh-sftp-server=y
 CONFIG_PACKAGE_openssl-util=y
 CONFIG_PACKAGE_xz-utils=y
+
+#内核 BTF（honk/dae 必需：CO-RE 加载路径要读 /sys/kernel/btf/vmlinux）
+#坑1：必须写成顶层 .config 的 CONFIG_KERNEL_*。Scripts/Settings.sh 里往
+#     target/linux/{generic,<target>}/config-* 写 CONFIG_DEBUG_INFO_BTF=y 会被
+#     include/kernel-defaults.mk 追加的 CONFIG_KERNEL_* 行覆盖，最终仍是 not set。
+#坑2：KERNEL_DEBUG_INFO_REDUCED 在非 BUILDBOT 构建下默认 y，而 BTF 依赖
+#     !KERNEL_DEBUG_INFO_REDUCED —— 不显式关掉，BTF 永远选不上。
+CONFIG_KERNEL_DEBUG_INFO=y
+# CONFIG_KERNEL_DEBUG_INFO_REDUCED is not set
+CONFIG_KERNEL_DEBUG_INFO_BTF=y
